@@ -67,6 +67,8 @@ class ParserStream {
         })
     }
 
+    here(): TextPosition { return this.#lexer.here() }
+
     peek(): lexer.Token { return this.#lexer.peek() }
     next(): lexer.Token { return this.#lexer.next() }
 
@@ -363,6 +365,7 @@ function reqObjField<T>(nm: string, tp: Parser<T>, lexName?: string): ObjectFiel
         lexName: lexName ? lexName : nm,
         arity: Arity.Required,
         setter: (p: ParserStream, obj: any, key: lexer.Identifier) => {
+
             if (obj[nm] !== undefined) {
                 p.pushError(key, `${nm} already defined.`)
                 return false
@@ -388,6 +391,7 @@ function reqObjField<T>(nm: string, tp: Parser<T>, lexName?: string): ObjectFiel
             }
 
             obj[nm] = r
+
             return true
         },
     }
@@ -406,18 +410,20 @@ interface Partial {
     [index: string]: any;
 }
 
-
 /**
  * Call one of matches if next token is a keyword that matches.
  *
  * @param fields List of keyword actions to match against.
  * @returns true if a match is found
  */
-function objectType(fields: ObjectField[],
+function objectType(
+    fields: ObjectField[],
     p: ParserStream,
     obj: Partial,
     fieldName: string,
-    tkn: lexer.Identifier): boolean {
+    tkn: lexer.Identifier,
+): boolean {
+
     const name = identParser(p)
     if (!name) {
         p.lexer.skipToNewLine
@@ -468,6 +474,8 @@ function objectType(fields: ObjectField[],
                     rcurly = t
                     break
                 }
+                console.log(`Unexpected operator ${t.value}`)
+                break
             default:
                 p.pushError(t, 'Unexpected token')
                 p.lexer.skipToNewLine()
@@ -488,7 +496,9 @@ function objectType(fields: ObjectField[],
     }
     if (hasUndefined) return false
     partial.definition = r
-    obj[fieldName].push(partial)
+
+    obj[fieldName].push(p.mkTracked(r, partial))
+
     return true
 }
 

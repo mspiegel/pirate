@@ -4,7 +4,7 @@
  * to the document updater for processing.
  */
 
-import { common } from '../shared/webviewProtocol.js'
+import { common } from '../shared/webviewProtocol'
 
 export type TrackedIndex = number
 

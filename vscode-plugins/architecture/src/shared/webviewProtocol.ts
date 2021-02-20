@@ -22,7 +22,7 @@ export namespace extension {
     export const enum Tag {
         SetSystemModel,
         InvalidateModel,
-        DocumentEdited
+        DocumentEdited,
     }
 
     /**

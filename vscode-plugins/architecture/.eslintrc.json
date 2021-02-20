@@ -58,10 +58,10 @@
                 "groups": [
                     "builtin",
                     "external",
+                    "internal",
                     "parent",
                     "sibling",
-                    "index",
-                    "internal"
+                    "index"
                 ],
                 "newlines-between": "always"
             }

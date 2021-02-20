@@ -11,7 +11,6 @@ export type TrackIndex = number
 /** Integer that identifies a file location in the underlying document. */
 export type LocationIndex = number
 
-
 export const enum Border {
     Left = 'left',
     Top = 'top',
@@ -24,8 +23,8 @@ export interface StringField {
 }
 
 /**
- * A value whose source location is tracked so we can
- * efficiently update the underlying document when it changes.
+ * A value whose source location is tracked so we can efficiently update the
+ * underlying document when it changes.
  */
 export interface TrackedValue<T> {
     readonly trackId: TrackIndex
@@ -33,7 +32,7 @@ export interface TrackedValue<T> {
 }
 
 /**
- * Common type for all named entiries in architecture.
+ * Common type for all named entities in architecture.
  */
 export interface NamedEntity {
     readonly name: TextLocated<string>
@@ -41,7 +40,7 @@ export interface NamedEntity {
 }
 
 export interface Port extends NamedEntity {
-    readonly location: LocationIndex
+    readonly location: TrackedValue<LocationIndex>
     readonly border: TrackedValue<Border>
     readonly offset: TrackedValue<number>
 }
@@ -53,13 +52,10 @@ export interface Actor extends NamedEntity {
     readonly width: TrackedValue<number>
     readonly height: TrackedValue<number>
     readonly color: StringField
-    readonly inPorts: Port[]
-    readonly outPorts: Port[]
+    readonly inPorts: TrackedValue<Port>[]
+    readonly outPorts: TrackedValue<Port>[]
 }
 
-/**
- * Orientation of bus
- */
 export const enum BusOrientation {
     Horizontal = 'horizontal',
     Vertical = 'vertical'
@@ -115,8 +111,8 @@ export interface Length {
 export interface SystemModel {
     readonly pagewidth: Length
     readonly pageheight: Length
-    readonly width: number
-    readonly actors: Actor[]
-    readonly buses: Bus[]
+    readonly width: TrackedValue<number>
+    readonly actors: TrackedValue<Actor>[]
+    readonly buses: TrackedValue<Bus>[]
     readonly connections: Connection[]
 }
