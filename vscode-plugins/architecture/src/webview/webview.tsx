@@ -274,7 +274,18 @@ class WebviewComponent extends React.Component<Props, State> {
             listenToTrackedInt('actors', actor, index, 'left')
             listenToTrackedInt('actors', actor, index, 'top')
             listenToTrackedInt('actors', actor, index, 'width')
+            // TODO: ports
         })
+
+        // Register listeners for tracked bus fields
+        this.state.actors.map((bus, index) => {
+            listenToTrackedInt('buses', bus, index, 'height')
+            listenToTrackedInt('buses', bus, index, 'left')
+            listenToTrackedInt('buses', bus, index, 'top')
+            listenToTrackedInt('buses', bus, index, 'width')
+        })
+
+        // TODO: connections
 
         const actors = this.state.actors.map((trackedActor, index) => {
             const actor = trackedActor.value
