@@ -122,13 +122,17 @@ export class ModelWebview {
                     if (this.model) { this.setModel(this.model) }
                     break
                 case webview.Tag.VisitURI:
-                    if (this.#setSystemModelWaitCount === 0) { svc.showDocument(e.locationIdx) }
+                    if (this.#setSystemModelWaitCount === 0) {
+                        svc.showDocument(e.locationIdx)
+                    }
                     break
                 case webview.Tag.UpdateDocument:
                     // Only apply update doc requests when we reject update doc
                     // requests if the system is waiting for a system layout wait
                     // count request.
-                    if (this.#setSystemModelWaitCount === 0) { svc.synchronizeEdits(this, e.edits) }
+                    if (this.#setSystemModelWaitCount === 0) {
+                        svc.synchronizeEdits(this, e.edits)
+                    }
                     break
                 case webview.Tag.SetSystemModelDone:
                     this.#setSystemModelWaitCount--

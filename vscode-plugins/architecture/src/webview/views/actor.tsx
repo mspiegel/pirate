@@ -85,7 +85,7 @@ export function Actor(props: Readonly<{
                 <span className='enclave-name'>{props.name}</span>
                 <a
                     className='enclave-visit-class'
-                    onClick={onVisitClassClick}
+                    onMouseDown={onVisitClassClick}
                 >[Visit Class]</a>
             </div>
         </foreignObject>

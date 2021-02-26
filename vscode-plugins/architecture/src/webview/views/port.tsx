@@ -19,16 +19,6 @@ export const portDimensions = {
 
 export enum PortDir { Out = 'Out', In = 'In' }
 
-interface Props {
-    border: A.Border
-    containerDimensions: Dimensions<number>
-    direction: PortDir
-    name: string
-    offset: number
-    // setMyBorder: (border: A.Border) => void
-    // setMyOffset: (offset: number) => void
-}
-
 function getMaxLeft(
     containerDimensions: Dimensions<number>,
     portDimensions: Dimensions<number>,
@@ -73,17 +63,20 @@ export function getPortLocalY(
 
 function getPortTransform(
     portDimensions: Dimensions<number>,
-    props: Props,
+    props: Readonly<{
+        border: A.Border,
+        containerDimensions: Dimensions<number>,
+        direction: PortDir,
+        offset: number,
+    }>
 ): string {
-    const { border, containerDimensions, direction, offset } = props
-
-    const x = getPortLocalX(border, containerDimensions, offset, portDimensions)
-    const y = getPortLocalY(border, containerDimensions, offset, portDimensions)
+    const x = getPortLocalX(props.border, props.containerDimensions, props.offset, portDimensions)
+    const y = getPortLocalY(props.border, props.containerDimensions, props.offset, portDimensions)
 
     const centerX = portDimensions.width / 2
     const centerY = portDimensions.height / 2
 
-    const rotate = calculatePortRotate(border, direction)
+    const rotate = calculatePortRotate(props.border, props.direction)
     return `${translateString(x, y)} ${rotateString(rotate, centerX, centerY)}`
 }
 

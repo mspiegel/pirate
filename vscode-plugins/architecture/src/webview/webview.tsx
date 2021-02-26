@@ -214,12 +214,13 @@ class WebviewComponent extends React.Component<Props, State> {
                 FieldKey extends keyof TrackedObjectType['value'],
                 TrackedFieldType extends A.TrackedValue<ValueType>,
                 TrackedObjectType extends A.TrackedValue<Record<FieldKey, TrackedFieldType>>
-            >
-                (
-                    modelKey: ModelKey,
-                    trackedObject: TrackedObjectType,
-                    index: number,
-                    fieldKey: FieldKey,
+            >(
+                modelKey: ModelKey,
+                // this is currently unused but helps type inference...
+                // TODO: find a way to get rid of it
+                _trackedObject: TrackedObjectType,
+                index: number,
+                fieldKey: FieldKey,
             ) =>
                 (value: ValueType) => {
 
@@ -240,12 +241,44 @@ class WebviewComponent extends React.Component<Props, State> {
                             ),
                         } as Pick<State, ModelKey>)
                     })
+                }
 
+        const broadcastUpdate =
+            <
+                ModelKey extends keyof SubModel & keyof State,
+                SubModel extends State & Record<ModelKey, TrackedObjectType[]>,
+                ValueType extends number | string,
+                FieldKey extends keyof TrackedObjectType['value'],
+                TrackedFieldType extends A.TrackedValue<ValueType>,
+                TrackedObjectType extends A.TrackedValue<Record<FieldKey, TrackedFieldType>>
+            >(
+                trackedObject: TrackedObjectType,
+                fieldKey: FieldKey,
+            ) =>
+                (value: ValueType) => {
                     // but also indicate the change to the document
                     const changes = new ChangeSet()
                     changes.replace(trackedObject.value[fieldKey].trackId, value)
                     this.props.sys.sendUpdateDoc(changes)
+                }
 
+        const updateStateAndBroadcast =
+            <
+                ModelKey extends keyof SubModel & keyof State,
+                SubModel extends State & Record<ModelKey, TrackedObjectType[]>,
+                ValueType extends number | string,
+                FieldKey extends keyof TrackedObjectType['value'],
+                TrackedFieldType extends A.TrackedValue<ValueType>,
+                TrackedObjectType extends A.TrackedValue<Record<FieldKey, TrackedFieldType>>
+            >(
+                modelKey: ModelKey,
+                trackedObject: TrackedObjectType,
+                index: number,
+                fieldKey: FieldKey,
+            ) =>
+                (value: ValueType) => {
+                    setStateField(modelKey, trackedObject, index, fieldKey)(value)
+                    broadcastUpdate(trackedObject, fieldKey)(value)
                 }
 
         const listenToTrackedInt =
@@ -278,7 +311,7 @@ class WebviewComponent extends React.Component<Props, State> {
         })
 
         // Register listeners for tracked bus fields
-        this.state.actors.map((bus, index) => {
+        this.state.buses.map((bus, index) => {
             listenToTrackedInt('buses', bus, index, 'height')
             listenToTrackedInt('buses', bus, index, 'left')
             listenToTrackedInt('buses', bus, index, 'top')
@@ -299,10 +332,10 @@ class WebviewComponent extends React.Component<Props, State> {
                     name={actor.name.value}
                     outPorts={actor.outPorts}
                     key={actor.name.value}
-                    setMyHeight={setStateField('actors', trackedActor, index, 'height')}
-                    setMyLeft={setStateField('actors', trackedActor, index, 'left')}
-                    setMyTop={setStateField('actors', trackedActor, index, 'top')}
-                    setMyWidth={setStateField('actors', trackedActor, index, 'width')}
+                    setMyHeight={updateStateAndBroadcast('actors', trackedActor, index, 'height')}
+                    setMyLeft={updateStateAndBroadcast('actors', trackedActor, index, 'left')}
+                    setMyTop={updateStateAndBroadcast('actors', trackedActor, index, 'top')}
+                    setMyWidth={updateStateAndBroadcast('actors', trackedActor, index, 'width')}
                     sys={this.props.sys}
                     top={actor.top.value}
                     width={actor.width.value}
@@ -316,10 +349,10 @@ class WebviewComponent extends React.Component<Props, State> {
                 left={bus.value.left.value}
                 key={bus.value.name.value}
                 locatedBus={bus}
-                setMyHeight={setStateField('buses', bus, index, 'height')}
-                setMyLeft={setStateField('buses', bus, index, 'left')}
-                setMyTop={setStateField('buses', bus, index, 'top')}
-                setMyWidth={setStateField('buses', bus, index, 'width')}
+                setMyHeight={updateStateAndBroadcast('buses', bus, index, 'height')}
+                setMyLeft={updateStateAndBroadcast('buses', bus, index, 'left')}
+                setMyTop={updateStateAndBroadcast('buses', bus, index, 'top')}
+                setMyWidth={updateStateAndBroadcast('buses', bus, index, 'width')}
                 sys={this.props.sys}
                 top={bus.value.top.value}
                 width={bus.value.width.value}
